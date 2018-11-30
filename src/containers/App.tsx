@@ -2,7 +2,6 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {BrowserRouter as Router, Link, Route} from "react-router-dom";
 import {bindActionCreators} from "redux";
-import {fetchConfig} from "../actions";
 import Game from "./Game";
 import GameList from "./GameList";
 import NewGame from "./NewGame";
@@ -57,6 +56,6 @@ class App extends React.Component {
 }
 
 const mapStateToProps = (state: any) => ({config:  state.config});
-const mapDispathToProps = (dispatch: any) => bindActionCreators({fetchConfig}, dispatch);
+const mapDispathToProps = (dispatch: any) => bindActionCreators({}, dispatch);
 
 export default connect(mapStateToProps, mapDispathToProps)(App);

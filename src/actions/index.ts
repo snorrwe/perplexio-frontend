@@ -97,22 +97,6 @@ export const fetchGameById = (config: any, id: number) => {
   };
 };
 
-export const fetchConfig = () => {
-  return (dispatch: any) => {
-    axios
-      .get(window.location.href + "/config.json")
-      .then(response => {
-        if (response.status === 200) {
-          dispatch(receiveConfig(response.data));
-        }
-      })
-      .catch(error => {
-        console.error("Failed to load config!", error);
-        return Promise.reject(error);
-      });
-  };
-};
-
 export const submitNewGame = (config: any, name: string, words: string[]) => {
   return (dispatch: any) => {
     axios
