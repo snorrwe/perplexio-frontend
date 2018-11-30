@@ -12,7 +12,6 @@
     "react-konva": "^16.6.11",
     "react-redux": "^5.1.0",
     "react-router-dom": "^4.3.1",
-    "react-scripts-ts": "^4.0.8",
     "redux": "^4.0.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
@@ -32,6 +31,7 @@
     "@types/react-redux": "^6.0.9",
     "@types/react-router-dom": "^4.3.1",
     "@types/redux-logger": "^3.0.6",
+    "react-scripts-ts": "^4.0.8",
     "typescript": "^3.1.6"
   },
   "browserslist": [
