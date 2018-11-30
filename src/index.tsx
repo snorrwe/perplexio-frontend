@@ -26,7 +26,9 @@ axios
   .get(baseUrl + "/config.json")
   .then(response => {
     if (response.status === 200) {
-      store.dispatch(receiveConfig(response.data));
+      let config = response.data;
+      config.baseUrl = baseUrl;
+      store.dispatch(receiveConfig(config));
     }
     ReactDOM.render(
       <Provider store={store}>

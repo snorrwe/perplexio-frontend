@@ -25,7 +25,7 @@ class App extends React.Component {
             </h1>
             {this.renderLogin()}
             </header>
-            <Router>
+            <Router basename={this.props.config.baseUrl}>
             <div>
             <Link to="/">
             Home
