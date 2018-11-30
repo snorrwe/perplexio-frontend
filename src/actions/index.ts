@@ -100,7 +100,7 @@ export const fetchGameById = (config: any, id: number) => {
 export const fetchConfig = () => {
   return (dispatch: any) => {
     axios
-      .get("./config.json")
+      .get(window.location.href + "/config.json")
       .then(response => {
         if (response.status === 200) {
           dispatch(receiveConfig(response.data));
