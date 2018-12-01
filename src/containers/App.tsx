@@ -1,6 +1,6 @@
 import * as React from "react";
 import {connect} from "react-redux";
-import {BrowserRouter as Router, Link, Route} from "react-router-dom";
+import {HashRouter as Router, Link, Route} from "react-router-dom";
 import {bindActionCreators} from "redux";
 import Game from "./Game";
 import GameList from "./GameList";
@@ -18,8 +18,6 @@ class App extends React.Component {
 
     public render() {
         let basename = window.location.pathname.split("/")[1] || "";
-        basename += "/#/";
-        console.log("Basename", basename);
         return (
             <div className="App">
             <header className="App-header">
