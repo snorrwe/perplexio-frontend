@@ -6,6 +6,14 @@ export const REFRESH_CONFIG = "REFRESH_CONFIG";
 export const REFRESH_NEW_GAME = "REFRESH_NEW_GAME ";
 export const START_SELECTION = "START_SELECTION";
 export const END_SELECTION = "END_SELECTION";
+export const REFRESH_USER_INFO = "REFRESH_USER_INFO";
+
+export const receiveUserInfo = (userinfo: any) =>{
+    return {
+        userinfo,
+        type: REFRESH_USER_INFO
+    }
+};
 
 export const receiveGames = (games: any) => {
   return {
