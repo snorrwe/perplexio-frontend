@@ -17,7 +17,9 @@ class App extends React.Component {
     }
 
     public render() {
-        let baseName = window.location.pathname.split("/")[1] || "";
+        let basename = window.location.pathname.split("/")[1] || "";
+        basename += "/#/";
+        console.log("Basename", basename);
         return (
             <div className="App">
             <header className="App-header">
@@ -26,7 +28,7 @@ class App extends React.Component {
             </h1>
             {this.renderLogin()}
             </header>
-            <Router basename={baseName}>
+            <Router basename={basename}>
             <div>
             <Link to="/">
             Home
