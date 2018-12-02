@@ -67,38 +67,31 @@ class PuzzleTable extends React.Component {
       solution = solution.sort((a, b) => a.x - b.x || a.y - b.y);
       let startx = solution[0].x * this.fontSize;
       let starty = solution[0].y * this.fontSize;
-      let endx = solution[1].x * this.fontSize;
-      let endy = solution[1].y * this.fontSize;
-      let len = Math.sqrt(
-        (startx - endx) * (startx - endx) + (starty - endy) * (starty - endy)
-      );
+      let x = solution[1].x * this.fontSize - startx;
+      let y = solution[1].y * this.fontSize - starty;
+      let len = Math.sqrt(x * x + y * y);
       if (len == 0) {
         return null;
       }
-      let angle = Math.acos((endx - startx) / len);
-      let x = endx - startx;
-      let y = endy - starty;
-      angle = angle * (180 / Math.PI);
-      let orient = -x * -y - (1 - x) * -y;
-      if (orient < 0) {
+      let angle = Math.acos(x / len);
+      angle *= 180 / Math.PI;
+      if (y < 0) {
         angle *= -1;
       }
-      console.log(solution, angle, orient);
-      let offsetX = this.fontSize / 2;
-      let offsetY = this.fontSize / 2;
+      let offset = this.fontSize / 2;
       return (
         <Rect
           cornerRadius={100}
           width={len + this.fontSize}
           height={this.fontSize}
-          x={startx + offsetX}
-          y={starty + offsetY}
+          x={startx + offset}
+          y={starty + offset}
           rotation={angle}
           opacity={0.3}
-          offsetX={offsetX}
-          offsetY={offsetY}
+          offsetX={offset}
+          offsetY={offset}
           fill="red"
-          key={"" + startx + starty + endx + endy}
+          key={"" + startx + starty + x + y}
         />
       );
     });
