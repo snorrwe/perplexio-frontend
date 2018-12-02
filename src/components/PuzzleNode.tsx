@@ -3,7 +3,12 @@ import * as React from "react";
 import { Text } from "react-konva";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { startSelection, endSelection } from "../actions";
+import {
+  validateSolution,
+  receiveHoveredNode,
+  startSelection,
+  endSelection
+} from "../actions";
 
 class PuzzleNode extends React.Component {
   public static propTypes = {
@@ -37,18 +42,33 @@ class PuzzleNode extends React.Component {
     if (!this.node) {
       return;
     }
+    this.node.on("mouseenter", (event: any) => {
+      this.props.receiveHoveredNode(this.props);
+    });
     this.node.on("mousedown", (event: any) => {
       this.props.startSelection(this.props);
     });
     this.node.on("mouseup", (event: any) => {
       this.props.endSelection(this.props);
+      this.props.validateSolution(
+        this.props.config,
+        [this.props.currentSelection[0], this.props],
+        this.props.game.id.id
+      );
     });
   }
 }
 
-const mapStateToProps = (state: any) => ({});
+const mapStateToProps = (state: any) => ({
+  game: state.currentGame,
+  currentSelection: state.currentSelection,
+  config: state.config
+});
 const mapDispathToProps = (dispatch: any) =>
-  bindActionCreators({ startSelection, endSelection }, dispatch);
+  bindActionCreators(
+    { startSelection, endSelection, receiveHoveredNode, validateSolution },
+    dispatch
+  );
 
 export default connect(
   mapStateToProps,

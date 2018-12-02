@@ -26,6 +26,7 @@ class PuzzleTable extends React.Component {
         <h1>{game && game.id.name}</h1>
         <small>by {game && game.id.owner}</small>
         <Stage width={WIDTH} height={HEIGHT}>
+          <Layer>{this.selection()}</Layer>
           <Layer>{this.table()}</Layer>
           <Layer>{this.solutions()}</Layer>
         </Stage>
@@ -33,7 +34,22 @@ class PuzzleTable extends React.Component {
     );
   }
 
-  public componentDidMount() {}
+  private selection() {
+    if (
+      !this.props.currentSelection[0] ||
+      this.props.currentSelection[1] ||
+      !this.props.currentHover
+    ) {
+      return null;
+    }
+    return (
+      <Solution
+        solution={[this.props.currentSelection[0], this.props.currentHover]}
+        size={this.fontSize}
+        color="red"
+      />
+    );
+  }
 
   private table() {
     if (!this.props.game) {
@@ -62,8 +78,7 @@ class PuzzleTable extends React.Component {
     if (!this.props.renderSolutions) {
       return;
     }
-    const solutions: any[] =
-      (this.props.game && this.props.game.table.solutions) || [];
+    const solutions: any[] = this.props.solutions || [];
     return solutions.map((solution: { x: number; y: number }[]) => {
       let startx = solution[0].x;
       let starty = solution[0].y;
@@ -80,7 +95,10 @@ class PuzzleTable extends React.Component {
 }
 
 const mapStateToProps = (state: any) => ({
-  game: state.currentGame
+  game: state.currentGame,
+  currentSelection: state.currentSelection,
+  currentHover: state.hover,
+  solutions: state.solutions
 });
 const mapDispathToProps = (dispatch: any) => bindActionCreators({}, dispatch);
 

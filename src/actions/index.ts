@@ -1,45 +1,24 @@
 import axios from "axios";
+export * from "./games";
 
-export const REFRESH_GAMES = "REFRESH_GAMES";
-export const REFRESH_CURRENT_GAME = "REFRESH_CURRENT_GAME";
-export const REFRESH_CONFIG = "REFRESH_CONFIG";
-export const REFRESH_NEW_GAME = "REFRESH_NEW_GAME ";
 export const START_SELECTION = "START_SELECTION";
 export const END_SELECTION = "END_SELECTION";
 export const REFRESH_USER_INFO = "REFRESH_USER_INFO";
+export const REFRESH_HOVERED_NODE = "REFRESH_HOVERED_NODE";
+export const REFRESH_SOLUTIONS = "REFRESH_SOLUTIONS";
+export const REFRESH_VALIDATION = "REFRESH_VALIDATION";
 
-export const receiveUserInfo = (userinfo: any) =>{
-    return {
-        userinfo,
-        type: REFRESH_USER_INFO
-    }
-};
-
-export const receiveGames = (games: any) => {
+export const receiveHoveredNode = (node: any) => {
   return {
-    games,
-    type: REFRESH_GAMES
+    node,
+    type: REFRESH_HOVERED_NODE
   };
 };
 
-export const receiveCurrentGame = (game: any) => {
+export const receiveUserInfo = (userinfo: any) => {
   return {
-    game,
-    type: REFRESH_CURRENT_GAME
-  };
-};
-
-export const receiveConfig = (config: any) => {
-  return {
-    config,
-    type: REFRESH_CONFIG
-  };
-};
-
-export const receiveNewGameStatus = (game: any) => {
-  return {
-    game,
-    type: REFRESH_NEW_GAME
+    userinfo,
+    type: REFRESH_USER_INFO
   };
 };
 
@@ -63,89 +42,65 @@ export const endSelection = (node?: IPuzzleNode) => {
   };
 };
 
-export const fetchGames = (config: any) => {
-  if (!config || !config.apiBaseUrl) {
-    return (dispatch: any) => {
-      console.error("Failed to fetch game by id. Reason: no config");
-    };
-  }
+export const fetchSolutionsByGameId = (config: any, gameId: number) => {
   return (dispatch: any) => {
     axios
-      .get(config.apiBaseUrl + "/games", { withCredentials: true })
-      .then(response => {
-        if (response.status === 200) {
-          const games = response.data;
-          dispatch(receiveGames(games));
-        }
-      });
-  };
-};
-
-export const fetchGameById = (config: any, id: number) => {
-  if (!config || !config.apiBaseUrl) {
-    return (dispatch: any) => {
-      console.error("Failed to fetch game by id. Reason: no config");
-    };
-  }
-  return (dispatch: any) => {
-    axios
-      .get(config.apiBaseUrl + "/game/" + id, { withCredentials: true })
-      .then(response => {
-        if (response.status === 200) {
-          const game = response.data;
-          dispatch(receiveCurrentGame(game));
-        }
-      })
-      .catch(error => {
-        if (error && error.response && error.response.status === 404) {
-          dispatch(receiveCurrentGame({ error: 404 }));
-        }
-        return Promise.reject(error);
-      });
-  };
-};
-
-export const submitNewGame = (config: any, name: string, words: string[]) => {
-  return (dispatch: any) => {
-    axios
-      .post(
-        config.apiBaseUrl + "/game",
-        { name, words },
-        { withCredentials: true }
-      )
-      .then(response => {
-        dispatch(receiveNewGameStatus({ id: response.data }));
-      })
-      .catch(error => {
-        dispatch(
-          receiveNewGameStatus({
-            error: (error.response && error.response.data) || "Unexpected error"
-          })
-        );
-      });
-  };
-};
-
-export const regenerateGame = (config: any, id: any) => {
-  return (dispatch: any) => {
-    axios
-      .post(config.apiBaseUrl + "/games/regenerate_board/" + id, null, {
+      .get(config.apiBaseUrl + "/solutions/" + gameId, {
         withCredentials: true
       })
       .then(response => {
-        if (response.status === 200) {
-          const game = response.data;
-          dispatch(receiveCurrentGame(game));
-        }
+        console.log("boi", response);
+        dispatch(receiveSolutions(response.data));
       })
       .catch(error => {
-        console.error("Failed to regenerate board", error);
+        console.error("Failed to get solutions", error);
       });
   };
 };
 
-export const clearNewGame = () => {
+export const receiveSolutions = (solutions: any[]) => {
+  return {
+    solutions,
+    type: REFRESH_SOLUTIONS
+  };
+};
+
+export const validateSolution = (
+  config: any,
+  solution: any,
+  gameId: number
+) => {
   return (dispatch: any) => {
-    dispatch(receiveNewGameStatus(null));
+    solution = solution
+      .map((a: any) => Object({ x: a.x, y: a.y }))
+      .sort((a: any, b: any) => a.x - b.x || a.y - b.y);
+    axios
+      .post(config.apiBaseUrl + "/solutions/" + gameId, [solution], {
+        withCredentials: true
+      })
+      .then(response => {
+        let ok = response.data[0];
+        if (ok) {
+          dispatch(fetchSolutionsByGameId(config, gameId));
+        }
+        dispatch(refreshValidation(solution, ok));
+      })
+      .catch(error => {
+        console.error(
+          "You forgot to implement the error handling, Ding Dong",
+          error
+        );
+      });
+    return {
+      type: null
+    };
+  };
+};
+
+export const refreshValidation = (solution: any, ok: boolean) => {
+  return {
+    solution,
+    ok,
+    type: REFRESH_VALIDATION
   };
 };
