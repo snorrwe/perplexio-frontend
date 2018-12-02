@@ -1,9 +1,10 @@
 import * as PropTypes from "prop-types";
 import * as React from "react";
-import { Rect, Layer, Stage } from "react-konva";
+import { Layer, Stage } from "react-konva";
 import PuzzleNode from "./PuzzleNode";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import Solution from "./Solution";
 
 const WIDTH = 500;
 const HEIGHT = 510;
@@ -64,34 +65,14 @@ class PuzzleTable extends React.Component {
     const solutions: any[] =
       (this.props.game && this.props.game.table.solutions) || [];
     return solutions.map((solution: { x: number; y: number }[]) => {
-      solution = solution.sort((a, b) => a.x - b.x || a.y - b.y);
-      let startx = solution[0].x * this.fontSize;
-      let starty = solution[0].y * this.fontSize;
-      let x = solution[1].x * this.fontSize - startx;
-      let y = solution[1].y * this.fontSize - starty;
-      let len = Math.sqrt(x * x + y * y);
-      if (len == 0) {
-        return null;
-      }
-      let angle = Math.acos(x / len);
-      angle *= 180 / Math.PI;
-      if (y < 0) {
-        angle *= -1;
-      }
-      let offset = this.fontSize / 2;
+      let startx = solution[0].x;
+      let starty = solution[0].y;
       return (
-        <Rect
-          cornerRadius={100}
-          width={len + this.fontSize}
-          height={this.fontSize}
-          x={startx + offset}
-          y={starty + offset}
-          rotation={angle}
-          opacity={0.3}
-          offsetX={offset}
-          offsetY={offset}
-          fill="red"
-          key={"" + startx + starty + x + y}
+        <Solution
+          solution={solution}
+          size={this.fontSize}
+          color="green"
+          key={"" + startx + starty}
         />
       );
     });
