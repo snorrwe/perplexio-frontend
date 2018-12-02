@@ -26,9 +26,9 @@ class PuzzleTable extends React.Component {
         <h1>{game && game.id.name}</h1>
         <small>by {game && game.id.owner}</small>
         <Stage width={WIDTH} height={HEIGHT}>
+          <Layer>{this.solutions()}</Layer>
           <Layer>{this.selection()}</Layer>
           <Layer>{this.table()}</Layer>
-          <Layer>{this.solutions()}</Layer>
         </Stage>
       </div>
     );
