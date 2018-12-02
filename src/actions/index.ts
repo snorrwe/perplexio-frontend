@@ -97,7 +97,7 @@ export const fetchGameById = (config: any, id: number) => {
         }
       })
       .catch(error => {
-        if (error.response.status === 404) {
+        if (error && error.response && error.response.status === 404) {
           dispatch(receiveCurrentGame({ error: 404 }));
         }
         return Promise.reject(error);

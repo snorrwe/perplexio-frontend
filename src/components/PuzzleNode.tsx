@@ -25,7 +25,7 @@ class PuzzleNode extends React.Component {
         text={this.props.value}
         x={this.props.x * fontSize}
         y={this.props.y * fontSize}
-        fontSize={fontSize-2}
+        fontSize={fontSize - 2}
         width={fontSize}
         height={fontSize}
         align="center"
@@ -34,6 +34,9 @@ class PuzzleNode extends React.Component {
   }
 
   public componentDidMount() {
+    if (!this.node) {
+      return;
+    }
     this.node.on("mousedown", (event: any) => {
       this.props.startSelection(this.props);
     });
