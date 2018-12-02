@@ -94,7 +94,7 @@ const validationReducer = (state = null, action: any) => {
 const solutionsReducer = (state = [], action: any) => {
   switch (action.type) {
     case REFRESH_CURRENT_GAME:
-      return action.game.table.solutions;
+      return action.game && action.game.table.solutions;
     case REFRESH_SOLUTIONS:
       return action.solutions;
     default:
