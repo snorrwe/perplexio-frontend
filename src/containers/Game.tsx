@@ -13,7 +13,8 @@ class Game extends React.Component {
   public props: any;
   public state = {
     availableFrom: undefined,
-    availableTo: undefined
+    availableTo: undefined,
+    renderSolutions: true
   };
 
   constructor(props: any) {
@@ -21,6 +22,7 @@ class Game extends React.Component {
     this.generateBoard = this.generateBoard.bind(this);
     this.handleAvailableToChange = this.handleAvailableToChange.bind(this);
     this.handleAvailableFromChange = this.handleAvailableFromChange.bind(this);
+    this.toggleSolutions = this.toggleSolutions.bind(this);
   }
 
   public render() {
@@ -29,7 +31,10 @@ class Game extends React.Component {
         return (
           <div className="row">
             <div className="col-md-6">
-              <PuzzleTable game={this.props.game} />
+              <PuzzleTable
+                renderSolutions={this.state.renderSolutions}
+                game={this.props.game}
+              />
             </div>
             <div className="col-md-6">
               {this.renderAdminFeatures(this.props.game)}
@@ -65,7 +70,10 @@ class Game extends React.Component {
       <div>
         <div className="row">
           <div className="col-md-6">
-            <button className="btn btn-primary" onClick={this.generateBoard}>
+            <button className="btn btn-primary" onClick={this.toggleSolutions}>
+              Toggle solutions
+            </button>
+            <button className="btn btn-danger" onClick={this.generateBoard}>
               Regenerate
             </button>
           </div>
@@ -103,16 +111,27 @@ class Game extends React.Component {
   }
 
   private handleAvailableFromChange(event: any) {
-    this.state.availableFrom = event.value;
+    this.setState({
+      availableFrom : event.value
+    });
   }
 
   private handleAvailableToChange(event: any) {
-    this.state.availableTo = event.value;
+    this.setState({
+      availableTo : event.value
+    });
   }
 
   private generateBoard(event: any) {
     event.preventDefault();
     this.props.regenerateGame(this.props.config, this.props.match.params.id);
+  }
+
+  private toggleSolutions(event: any) {
+    event.preventDefault();
+    this.setState({
+      renderSolutions: !this.state.renderSolutions
+    });
   }
 }
 

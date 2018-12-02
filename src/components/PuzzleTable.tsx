@@ -10,7 +10,8 @@ const HEIGHT = 510;
 
 class PuzzleTable extends React.Component {
   public static propTypes = {
-    game: PropTypes.any
+    game: PropTypes.any,
+    renderSolutions: PropTypes.bool
   };
 
   public props: any;
@@ -57,10 +58,13 @@ class PuzzleTable extends React.Component {
   }
 
   private solutions() {
+    if (!this.props.renderSolutions) {
+      return;
+    }
     const solutions: any[] =
       (this.props.game && this.props.game.table.solutions) || [];
     return solutions.map((solution: { x: number; y: number }[]) => {
-      solution = solution.sort((a, b) => a.x - b.x  || a.y - b.y);
+      solution = solution.sort((a, b) => a.x - b.x || a.y - b.y);
       let startx = solution[0].x * this.fontSize;
       let starty = solution[0].y * this.fontSize;
       let endx = solution[1].x * this.fontSize;
