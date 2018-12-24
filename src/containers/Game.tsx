@@ -23,35 +23,37 @@ class Game extends React.Component {
     this.handleAvailableToChange = this.handleAvailableToChange.bind(this);
     this.handleAvailableFromChange = this.handleAvailableFromChange.bind(this);
     this.toggleSolutions = this.toggleSolutions.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
+    this.updateGame = this.updateGame.bind(this);
   }
 
   public render() {
-    if (this.props.game) {
-      if (!this.props.game.error) {
-        return (
-          <div className="row">
-            <div className="col-md-6">
-              <PuzzleTable
-                renderSolutions={this.state.renderSolutions}
-                game={this.props.game}
-              />
-            </div>
-            <div className="col-md-6">
-              {this.renderAdminFeatures(this.props.game)}
-            </div>
-          </div>
-        );
-      } else if (this.props.game.error === 404) {
-        return <div className="alert alert-danger">404 Game not found</div>;
-      } else {
-        return (
-          <div className="alert alert-danger">
-            Error loading game: {this.props.game.error}
-          </div>
-        );
-      }
+    if (!this.props.game) {
+      return null;
     }
-    return null;
+    if (!this.props.game.error) {
+      return (
+        <div className="row">
+          <div className="col-md-6">
+            <PuzzleTable
+              renderSolutions={this.state.renderSolutions}
+              game={this.props.game}
+            />
+          </div>
+          <div className="col-md-6">
+            {this.renderAdminFeatures(this.props.game)}
+          </div>
+        </div>
+      );
+    } else if (this.props.game.error === 404) {
+      return <div className="alert alert-danger">404 Game not found</div>;
+    } else {
+      return (
+        <div className="alert alert-danger">
+          Error loading game: {this.props.game.error}
+        </div>
+      );
+    }
   }
 
   public componentDidMount() {
@@ -74,8 +76,23 @@ class Game extends React.Component {
               Toggle solutions
             </button>
             <button className="btn btn-danger" onClick={this.generateBoard}>
-              Regenerate
+              Regenerate board
             </button>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="form-group">
+              <label>Name of the game</label>
+              <input
+                className="form-control"
+                type="text"
+                required={true}
+                value={game.id.name}
+                onChange={this.handleNameChange}
+                placeholder="Name of the game"
+              />
+            </div>
           </div>
         </div>
         <div className="row">
@@ -86,12 +103,14 @@ class Game extends React.Component {
                 className="form-control"
                 type="datetime-local"
                 required={true}
-                value={this.state.availableFrom}
+                value={game.availableFrom}
                 onChange={this.handleAvailableFromChange}
                 placeholder="Comperation start"
               />
             </div>
           </div>
+        </div>
+        <div className="row">
           <div className="col-md-6">
             <div className="form-group">
               <label>Comperation end</label>
@@ -99,26 +118,52 @@ class Game extends React.Component {
                 className="form-control"
                 type="datetime-local"
                 required={true}
-                value={this.state.availableFrom}
+                value={game.availableTo}
                 onChange={this.handleAvailableToChange}
                 placeholder="Comperation end"
               />
             </div>
           </div>
         </div>
+        <div className="row">
+          <div className="col-md-6">
+            <button className="btn btn-success" onClick={this.updateGame}>
+              Update game
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
+  private updateGame(event: any) {
+    // TODO
+  }
+
+  private handleNameChange(event: any) {
+    this.setState((state: any, props: any) => {
+      props.game.id.name = event.value;
+      return {
+        name: event.value
+      };
+    });
+  }
+
   private handleAvailableFromChange(event: any) {
-    this.setState({
-      availableFrom : event.value
+    this.setState((state: any, props: any) => {
+      props.game.availableFrom = event.value;
+      return {
+        availableFrom: event.value
+      };
     });
   }
 
   private handleAvailableToChange(event: any) {
-    this.setState({
-      availableTo : event.value
+    this.setState((state: any, props: any) => {
+      props.game.availableTo = event.value;
+      return {
+        availableTo: event.value
+      };
     });
   }
 
