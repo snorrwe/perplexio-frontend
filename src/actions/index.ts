@@ -7,6 +7,7 @@ export const REFRESH_USER_INFO = "REFRESH_USER_INFO";
 export const REFRESH_HOVERED_NODE = "REFRESH_HOVERED_NODE";
 export const REFRESH_SOLUTIONS = "REFRESH_SOLUTIONS";
 export const REFRESH_VALIDATION = "REFRESH_VALIDATION";
+export const REFRESH_UPDATE_FORM = "REFRESH_UPDATE_FORM";
 
 export const receiveHoveredNode = (node: any) => {
   return {
@@ -102,5 +103,28 @@ export const refreshValidation = (solution: any, ok: boolean) => {
     solution,
     ok,
     type: REFRESH_VALIDATION
+  };
+};
+
+export const updateGame = (config: any, gameId: any) => {
+  axios
+    .put(config.apiBaseUrl + "/game/" + gameId.id, gameId, {
+      withCredentials: true
+    })
+    .then(response => {
+      console.log("Boi");
+    })
+    .catch(error => {
+      console.error("Bruh");
+    });
+  return {
+    type: null
+  };
+};
+
+export const refreshUpdateGameForm = (formData: any) => {
+  return {
+    formData,
+    type: REFRESH_UPDATE_FORM
   };
 };

@@ -2,12 +2,11 @@ import * as PropTypes from "prop-types";
 import * as React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { regenerateGame, fetchGameById, receiveCurrentGame } from "../actions";
+import { regenerateGame, refreshUpdateGameForm, updateGame } from "../actions";
 
 class GameAdmin extends React.Component {
   public static propTypes = {
-    game: PropTypes.any,
-      gameId: PropTypes.string
+    updateForm: PropTypes.any
   };
 
   public props: any;
@@ -15,18 +14,13 @@ class GameAdmin extends React.Component {
   constructor(props: any) {
     super(props);
     this.generateBoard = this.generateBoard.bind(this);
-    this.handleAvailableToChange = this.handleAvailableToChange.bind(this);
-    this.handleAvailableFromChange = this.handleAvailableFromChange.bind(this);
+    this.handleFormChange = this.handleFormChange.bind(this);
     this.toggleSolutions = this.toggleSolutions.bind(this);
-    this.handleNameChange = this.handleNameChange.bind(this);
     this.updateGame = this.updateGame.bind(this);
   }
 
   public render() {
-    return this.renderAdminFeatures(this.props.game);
-  }
-
-  private renderAdminFeatures(game: any) {
+    let updateForm = this.props.updateForm;
     return (
       <div>
         <div className="row">
@@ -44,11 +38,12 @@ class GameAdmin extends React.Component {
             <div className="form-group">
               <label>Name of the game</label>
               <input
+                name="name"
                 className="form-control"
                 type="text"
                 required={true}
-                value={game.id.name}
-                onChange={this.handleNameChange}
+                value={updateForm.name}
+                onChange={this.handleFormChange}
                 placeholder="Name of the game"
               />
             </div>
@@ -57,14 +52,15 @@ class GameAdmin extends React.Component {
         <div className="row">
           <div className="col-md-6">
             <div className="form-group">
-              <label>Comperation start</label>
+              <label>Competition start</label>
               <input
+                name="availableFrom"
                 className="form-control"
                 type="datetime-local"
                 required={true}
-                value={game.id.availableFrom}
-                onChange={this.handleAvailableFromChange}
-                placeholder="Comperation start"
+                value={updateForm.availableFrom || Date.now()}
+                onChange={this.handleFormChange}
+                placeholder="Competition start"
               />
             </div>
           </div>
@@ -72,14 +68,15 @@ class GameAdmin extends React.Component {
         <div className="row">
           <div className="col-md-6">
             <div className="form-group">
-              <label>Comperation end</label>
+              <label>Competition end</label>
               <input
+                name="availableTo"
                 className="form-control"
                 type="datetime-local"
                 required={true}
-                value={game.id.availableTo}
-                onChange={this.handleAvailableToChange}
-                placeholder="Comperation end"
+                value={updateForm.availableTo || Date.now()}
+                onChange={this.handleFormChange}
+                placeholder="Competition end"
               />
             </div>
           </div>
@@ -96,59 +93,47 @@ class GameAdmin extends React.Component {
   }
 
   private updateGame(event: any) {
-    let game = this.props && this.props.game;
+    let game = this.props && this.props.updateForm;
     if (!game) {
       return;
     }
-    console.log("TODO send update", game);
+    this.props.updateGame(this.props.config, this.props.updateForm);
   }
 
-  private handleNameChange(event: any) {
+  private updateForm(key: any, value: any): any {
+    let form = JSON.parse(JSON.stringify(this.props.updateForm));
+    form[key] = value;
+    this.props.refreshUpdateGameForm(form);
+  }
+
+  private handleFormChange(event: any) {
     if (!event || !event.target) {
       return;
     }
     const value = event.target.value;
-    this.props.game.id.name = value;
-    this.props.receiveCurrentGame(this.props.game);
-  }
-
-  private handleAvailableFromChange(event: any) {
-    if (!event || !event.target) {
-      return;
-    }
-    const value = event.target.value;
-    this.props.game.id.availableFrom = value;
-    this.props.receiveCurrentGame(this.props.game);
-  }
-
-  private handleAvailableToChange(event: any) {
-    if (!event || !event.target) {
-      return;
-    }
-    const value = event.target.value;
-    this.props.game.id.availableTo = value;
-    this.props.receiveCurrentGame(this.props.game);
+    const name = event.target.name;
+    this.updateForm(name, value);
   }
 
   private generateBoard(event: any) {
     event.preventDefault();
-    this.props.regenerateGame(this.props.config, this.props.game.id.id);
+    this.props.regenerateGame(this.props.config, this.props.updateForm.id);
   }
 
   private toggleSolutions(event: any) {
     event.preventDefault();
-      // TODO: propagate showSolutions 
+    // TODO: propagate showSolutions
   }
 }
 
 const mapStateToProps = (state: any) => ({
   config: state.config,
-  game: state.currentGame
+  updateForm: state.updateForm
 });
 
 const mapDispathToProps = (dispatch: any) =>
   bindActionCreators(
-    { regenerateGame, fetchGameById, receiveCurrentGame },
+    { regenerateGame, refreshUpdateGameForm, updateGame },
     dispatch
   );
 

@@ -9,7 +9,8 @@ import {
   REFRESH_NEW_GAME,
   REFRESH_USER_INFO,
   REFRESH_HOVERED_NODE,
-  REFRESH_VALIDATION
+  REFRESH_VALIDATION,
+  REFRESH_UPDATE_FORM
 } from "../actions";
 
 const refreshHoverReducer = (state = null, action: any) => {
@@ -102,6 +103,26 @@ const solutionsReducer = (state = [], action: any) => {
   }
 };
 
+const updateFormReducer = (state = null, action: any) => {
+  switch (action.type) {
+    case REFRESH_UPDATE_FORM:
+      return action.formData;
+    case REFRESH_CURRENT_GAME:
+      if (!action.game) {
+        return null;
+      }
+      let id = action.game.id;
+      return {
+        id: id.id,
+        name: id.name,
+        availableFrom: id.availableFrom,
+        availableTo: id.availableTo
+      };
+    default:
+      return state;
+  }
+};
+
 const rootReducer = combineReducers({
   config: refreshConfigReducer,
   currentGame: refreshCurrentGameReducer,
@@ -111,7 +132,8 @@ const rootReducer = combineReducers({
   userinfo: refreshUserInfoReducer,
   hover: refreshHoverReducer,
   lastWasValid: validationReducer,
-  solutions: solutionsReducer
+  solutions: solutionsReducer,
+  updateForm: updateFormReducer
 });
 
 export default rootReducer;
