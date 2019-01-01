@@ -92,9 +92,6 @@ export const validateSolution = (
           error
         );
       });
-    return {
-      type: null
-    };
   };
 };
 
@@ -106,19 +103,18 @@ export const refreshValidation = (solution: any, ok: boolean) => {
   };
 };
 
-export const updateGame = (config: any, gameId: any) => {
-  axios
-    .put(config.apiBaseUrl + "/game/" + gameId.id, gameId, {
-      withCredentials: true
-    })
-    .then(response => {
-      console.log("Boi");
-    })
-    .catch(error => {
-      console.error("Bruh");
-    });
-  return {
-    type: null
+export const updateGame = (config: any, form: any) => {
+  return (dispatch: any) => {
+    axios
+      .put(config.apiBaseUrl + "/game/" + form.id, form, {
+        withCredentials: true
+      })
+      .then(response => {
+        console.log("Boi");
+      })
+      .catch(error => {
+        console.error("Bruh");
+      });
   };
 };
 
