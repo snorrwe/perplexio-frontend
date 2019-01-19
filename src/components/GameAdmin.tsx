@@ -5,16 +5,8 @@ import { bindActionCreators } from "redux";
 import { regenerateGame, refreshUpdateGameForm, updateGame } from "../actions";
 import { Button } from "react-md/lib/Buttons";
 import InputField from "react-md/lib/TextFields";
-import { DatePicker, Grid, Cell } from "react-md";
-
-const DATE_FORMAT_OPTIONS: any = {
-  year: "numeric",
-  month: "numeric",
-  day: "numeric",
-  hour: "numeric",
-  minute: "numeric",
-  second: "numeric",
-};
+import { Grid, Cell } from "react-md";
+import { DateRange } from "react-date-range";
 
 class GameAdmin extends React.Component {
   public static propTypes = {
@@ -27,15 +19,19 @@ class GameAdmin extends React.Component {
   constructor(props: any) {
     super(props);
     this.generateBoard = this.generateBoard.bind(this);
-    this.handleFormChange = this.handleFormChange.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
     this.toggleSolutions = this.toggleSolutions.bind(this);
     this.updateGame = this.updateGame.bind(this);
-    this.handleAvaibleToChange = this.handleAvaibleToChange.bind(this);
-    this.handleAvaibleFromChange = this.handleAvaibleFromChange.bind(this);
+    this.handleAvialabilityChange = this.handleAvialabilityChange.bind(this);
   }
 
   public render() {
     let updateForm = this.props.updateForm;
+    let availableRange = {
+      startDate: new Date(updateForm.availableFrom),
+      endDate: new Date(updateForm.availableTo),
+      key: "availability"
+    };
     return (
       <>
         <Grid>
@@ -54,43 +50,23 @@ class GameAdmin extends React.Component {
           <Cell size={8}>
             <div className="form-group">
               <InputField
+                id="name"
                 name="name"
                 label="Name of the game"
-                className="form-control"
                 type="text"
                 required={true}
                 value={updateForm.name}
-                onChange={this.handleFormChange}
-                placeholder="Name of the game"
+                onChange={this.handleNameChange}
               />
             </div>
           </Cell>
         </Grid>
         <Grid>
           <Cell size={8}>
-            <DatePicker
-              id="availableFrom"
-              displayMode="portrait"
-              required={true}
-              value={updateForm.availableFrom || Date.now()}
-              autoOk={true}
-              onChange={this.handleAvaibleFromChange}
-              label="Competition start"
-              formatOptions={DATE_FORMAT_OPTIONS}
-            />
-          </Cell>
-        </Grid>
-        <Grid>
-          <Cell size={8}>
-            <DatePicker
-              id="availableTo"
-              displayMode="portrait"
-              required={true}
-              value={updateForm.availableTo || Date.now()}
-              autoOk={true}
-              onChange={this.handleAvaibleToChange}
-              label="Competition end"
-              formatOptions={DATE_FORMAT_OPTIONS}
+            <DateRange
+              ranges={[availableRange]}
+              minDate={new Date() as any}
+              onChange={this.handleAvialabilityChange}
             />
           </Cell>
         </Grid>
@@ -119,21 +95,18 @@ class GameAdmin extends React.Component {
     this.props.refreshUpdateGameForm(form);
   }
 
-  private handleFormChange(event: any) {
-    if (!event || !event.target) {
-      return;
-    }
-    const value = event.target.value;
-    const name = event.target.name;
-    this.updateForm(name, value);
+  private handleNameChange(value: any) {
+    this.updateForm("name", value);
   }
 
-  private handleAvaibleFromChange(value: string, dateValue: Date, event: any) {
-    this.updateForm("availableFrom", dateValue);
-  }
-
-  private handleAvaibleToChange(value: string, dateValue: Date, event: any) {
-    this.updateForm("availableTo", dateValue);
+  private handleAvialabilityChange(value: any) {
+    const range = value["availability"];
+    let availableFrom = range["startDate"];
+    let availableTo = range["endDate"];
+    let form = JSON.parse(JSON.stringify(this.props.updateForm));
+    form.availableFrom = availableFrom;
+    form.availableTo = availableTo;
+    this.props.refreshUpdateGameForm(form);
   }
 
   private generateBoard(event: any) {
