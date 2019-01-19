@@ -5,7 +5,8 @@ import { bindActionCreators } from "redux";
 import Game from "./Game";
 import GameList from "./GameList";
 import NewGame from "./NewGame";
-import "./App.css";
+import "./App.scss";
+import { Button } from "react-md";
 
 class App extends React.Component {
   public props: any;
@@ -18,13 +19,21 @@ class App extends React.Component {
   public render() {
     return (
       <div className="App">
-        <header className="App-header">
-          {this.renderLogin()}
-        </header>
         <Router>
           <div>
-            <Link to="/">Home</Link>
-            <Link to="/newgame">New Game</Link>
+            <header className="App-header">
+              <Link to="/">
+                <Button primary={true} raised={true}>
+                  Home
+                </Button>
+              </Link>
+              <Link to="/newgame">
+                <Button primary={true} raised={true}>
+                  New Game
+                </Button>
+              </Link>
+              {this.renderLogin()}
+            </header>
             <Route exact={true} path="/" component={GameList} />
             <Route path="/game" />
             <Route path="/game/:id" component={Game} />
@@ -37,15 +46,12 @@ class App extends React.Component {
 
   private renderLogin() {
     if (this.props.userinfo) {
-      return <h4>Hello, {this.props.userinfo.name}</h4>;
+      return <>Hello, {this.props.userinfo.name}</>;
     }
     if (this.props.config) {
       return (
-        <a
-          className="btn btn-primary"
-          href={this.props.config.apiBaseUrl + "/login"}
-        >
-          Log In
+        <a href={this.props.config.apiBaseUrl + "/login"}>
+          <Button primary={true}>Log In</Button>
         </a>
       );
     }

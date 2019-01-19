@@ -7,14 +7,14 @@ import { applyMiddleware, createStore } from "redux";
 import { createLogger } from "redux-logger";
 import thunk from "redux-thunk";
 
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
+
 import { receiveConfig , receiveUserInfo} from "./actions";
 import App from "./containers/App";
 import "./index.css";
 import reducer from "./reducers";
 import registerServiceWorker from "./registerServiceWorker";
-
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
 
 const middleware = [thunk];
 if (process.env.NODE_ENV !== "production") {
