@@ -5,6 +5,7 @@ import { bindActionCreators } from "redux";
 import { regenerateGame, fetchGameById, receiveCurrentGame } from "../actions";
 import PuzzleTable from "../components/PuzzleTable";
 import GameAdmin from "../components/GameAdmin";
+import { Grid, Cell } from "react-md";
 
 class Game extends React.Component {
   public static propTypes = {
@@ -26,15 +27,15 @@ class Game extends React.Component {
     }
     if (!this.props.game.error) {
       return (
-        <div className="row">
-          <div className="col-md-6">
+        <Grid>
+          <Cell size={6}>
             <PuzzleTable
               renderSolutions={this.state.renderSolutions}
               game={this.props.game}
             />
-          </div>
-          <div className="col-md-6">{this.renderAdmin(this.props.game)}</div>
-        </div>
+          </Cell>
+          <Cell size={6}>{this.renderAdmin(this.props.game)}</Cell>
+        </Grid>
       );
     } else if (this.props.game.error === 404) {
       return <div className="alert alert-danger">404 Game not found</div>;

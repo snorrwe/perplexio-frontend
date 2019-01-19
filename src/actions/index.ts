@@ -104,6 +104,7 @@ export const refreshValidation = (solution: any, ok: boolean) => {
 };
 
 export const updateGame = (config: any, form: any) => {
+  console.log(form, new Date(form["availableFrom"]));
   return (dispatch: any) => {
     axios
       .put(config.apiBaseUrl + "/game/" + form.id, form, {

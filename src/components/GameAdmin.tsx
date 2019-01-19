@@ -3,10 +3,23 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { regenerateGame, refreshUpdateGameForm, updateGame } from "../actions";
+import { Button } from "react-md/lib/Buttons";
+import InputField from "react-md/lib/TextFields";
+import { DatePicker, Grid, Cell } from "react-md";
+
+const DATE_FORMAT_OPTIONS: any = {
+  year: "numeric",
+  month: "numeric",
+  day: "numeric",
+  hour: "numeric",
+  minute: "numeric",
+  second: "numeric",
+};
 
 class GameAdmin extends React.Component {
   public static propTypes = {
-    updateForm: PropTypes.any
+    updateForm: PropTypes.any,
+    game: PropTypes.any
   };
 
   public props: any;
@@ -17,28 +30,32 @@ class GameAdmin extends React.Component {
     this.handleFormChange = this.handleFormChange.bind(this);
     this.toggleSolutions = this.toggleSolutions.bind(this);
     this.updateGame = this.updateGame.bind(this);
+    this.handleAvaibleToChange = this.handleAvaibleToChange.bind(this);
+    this.handleAvaibleFromChange = this.handleAvaibleFromChange.bind(this);
   }
 
   public render() {
     let updateForm = this.props.updateForm;
     return (
-      <div>
-        <div className="row">
-          <div className="col-md-6">
-            <button className="btn btn-primary" onClick={this.toggleSolutions}>
+      <>
+        <Grid>
+          <Cell size={4}>
+            <Button raised={true} primary={true} onClick={this.toggleSolutions}>
               Toggle solutions
-            </button>
-            <button className="btn btn-danger" onClick={this.generateBoard}>
+            </Button>
+          </Cell>
+          <Cell size={4}>
+            <Button raised={true} secondary={true} onClick={this.generateBoard}>
               Regenerate board
-            </button>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
+            </Button>
+          </Cell>
+        </Grid>
+        <Grid>
+          <Cell size={8}>
             <div className="form-group">
-              <label>Name of the game</label>
-              <input
+              <InputField
                 name="name"
+                label="Name of the game"
                 className="form-control"
                 type="text"
                 required={true}
@@ -47,48 +64,44 @@ class GameAdmin extends React.Component {
                 placeholder="Name of the game"
               />
             </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
-            <div className="form-group">
-              <label>Competition start</label>
-              <input
-                name="availableFrom"
-                className="form-control"
-                type="datetime-local"
-                required={true}
-                value={updateForm.availableFrom || Date.now()}
-                onChange={this.handleFormChange}
-                placeholder="Competition start"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
-            <div className="form-group">
-              <label>Competition end</label>
-              <input
-                name="availableTo"
-                className="form-control"
-                type="datetime-local"
-                required={true}
-                value={updateForm.availableTo || Date.now()}
-                onChange={this.handleFormChange}
-                placeholder="Competition end"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
-            <button className="btn btn-success" onClick={this.updateGame}>
+          </Cell>
+        </Grid>
+        <Grid>
+          <Cell size={8}>
+            <DatePicker
+              id="availableFrom"
+              displayMode="portrait"
+              required={true}
+              value={updateForm.availableFrom || Date.now()}
+              autoOk={true}
+              onChange={this.handleAvaibleFromChange}
+              label="Competition start"
+              formatOptions={DATE_FORMAT_OPTIONS}
+            />
+          </Cell>
+        </Grid>
+        <Grid>
+          <Cell size={8}>
+            <DatePicker
+              id="availableTo"
+              displayMode="portrait"
+              required={true}
+              value={updateForm.availableTo || Date.now()}
+              autoOk={true}
+              onChange={this.handleAvaibleToChange}
+              label="Competition end"
+              formatOptions={DATE_FORMAT_OPTIONS}
+            />
+          </Cell>
+        </Grid>
+        <Grid>
+          <Cell size={4}>
+            <Button raised={true} primary={true} onClick={this.updateGame}>
               Update game
-            </button>
-          </div>
-        </div>
-      </div>
+            </Button>
+          </Cell>
+        </Grid>
+      </>
     );
   }
 
@@ -113,6 +126,14 @@ class GameAdmin extends React.Component {
     const value = event.target.value;
     const name = event.target.name;
     this.updateForm(name, value);
+  }
+
+  private handleAvaibleFromChange(value: string, dateValue: Date, event: any) {
+    this.updateForm("availableFrom", dateValue);
+  }
+
+  private handleAvaibleToChange(value: string, dateValue: Date, event: any) {
+    this.updateForm("availableTo", dateValue);
   }
 
   private generateBoard(event: any) {
