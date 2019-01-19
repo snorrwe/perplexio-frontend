@@ -32,14 +32,15 @@ class GameAdmin extends React.Component {
       endDate: new Date(updateForm.availableTo),
       key: "availability"
     };
+    // Toggle button
+    // <Cell size={4}>
+    //   <Button raised={true} primary={true} onClick={this.toggleSolutions}>
+    //     Toggle solutions
+    //   </Button>
+    // </Cell>
     return (
       <>
         <Grid>
-          <Cell size={4}>
-            <Button raised={true} primary={true} onClick={this.toggleSolutions}>
-              Toggle solutions
-            </Button>
-          </Cell>
           <Cell size={4}>
             <Button raised={true} secondary={true} onClick={this.generateBoard}>
               Regenerate board
@@ -47,22 +48,20 @@ class GameAdmin extends React.Component {
           </Cell>
         </Grid>
         <Grid>
-          <Cell size={8}>
-            <div className="form-group">
-              <InputField
-                id="name"
-                name="name"
-                label="Name of the game"
-                type="text"
-                required={true}
-                value={updateForm.name}
-                onChange={this.handleNameChange}
-              />
-            </div>
+          <Cell size={6}>
+            <InputField
+              id="name"
+              name="name"
+              label="Name of the game"
+              type="text"
+              required={true}
+              value={updateForm.name}
+              onChange={this.handleNameChange}
+            />
           </Cell>
         </Grid>
         <Grid>
-          <Cell size={8}>
+          <Cell size={6}>
             <DateRange
               ranges={[availableRange]}
               minDate={new Date() as any}
