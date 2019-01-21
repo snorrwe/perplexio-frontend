@@ -10,7 +10,8 @@ import {
   REFRESH_USER_INFO,
   REFRESH_HOVERED_NODE,
   REFRESH_VALIDATION,
-  REFRESH_UPDATE_FORM
+  REFRESH_UPDATE_FORM,
+  REFRESH_GAME_ERROR
 } from "../actions";
 
 const refreshHoverReducer = (state = null, action: any) => {
@@ -38,10 +39,16 @@ const refreshGamesReducer = (state = [], action: any) => {
   }
 };
 
-const refreshCurrentGameReducer = (state = null, action: any) => {
+const refreshCurrentGameReducer = (state: any = null, action: any) => {
   switch (action.type) {
     case REFRESH_CURRENT_GAME:
       return action.game;
+    case REFRESH_GAME_ERROR:
+      if (!state) {
+        state = {};
+      }
+      state.error = action.error;
+      return JSON.parse(JSON.stringify(state));
     default:
       return state;
   }

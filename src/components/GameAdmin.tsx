@@ -2,7 +2,12 @@ import * as PropTypes from "prop-types";
 import * as React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { regenerateGame, refreshUpdateGameForm, updateGame } from "../actions";
+import {
+  publishGame,
+  regenerateGame,
+  refreshUpdateGameForm,
+  updateGame
+} from "../actions";
 import { Button } from "react-md/lib/Buttons";
 import InputField from "react-md/lib/TextFields";
 import { Grid, Cell } from "react-md";
@@ -23,6 +28,7 @@ class GameAdmin extends React.Component {
     this.toggleSolutions = this.toggleSolutions.bind(this);
     this.updateGame = this.updateGame.bind(this);
     this.handleAvialabilityChange = this.handleAvialabilityChange.bind(this);
+    this.publishGame = this.publishGame.bind(this);
   }
 
   public render() {
@@ -32,6 +38,17 @@ class GameAdmin extends React.Component {
       endDate: new Date(updateForm.availableTo),
       key: "availability"
     };
+    if (this.props.game.id.published) {
+      return (
+        <>
+          <Grid>
+            <Cell size={4}>
+              <div>Game is live until {this.props.game.id.availableTo}</div>
+            </Cell>
+          </Grid>
+        </>
+      );
+    }
     // Toggle button
     // <Cell size={4}>
     //   <Button raised={true} primary={true} onClick={this.toggleSolutions}>
@@ -73,6 +90,11 @@ class GameAdmin extends React.Component {
           <Cell size={4}>
             <Button raised={true} primary={true} onClick={this.updateGame}>
               Update game
+            </Button>
+          </Cell>
+          <Cell size={4}>
+            <Button raised={true} primary={true} onClick={this.publishGame}>
+              Publish
             </Button>
           </Cell>
         </Grid>
@@ -117,6 +139,11 @@ class GameAdmin extends React.Component {
     event.preventDefault();
     // TODO: propagate showSolutions
   }
+
+  private publishGame() {
+    const props = this.props;
+    props.publishGame(props.config, props.game);
+  }
 }
 
 const mapStateToProps = (state: any) => ({
@@ -126,7 +153,7 @@ const mapStateToProps = (state: any) => ({
 
 const mapDispathToProps = (dispatch: any) =>
   bindActionCreators(
-    { regenerateGame, refreshUpdateGameForm, updateGame },
+    { publishGame, regenerateGame, refreshUpdateGameForm, updateGame },
     dispatch
   );
 

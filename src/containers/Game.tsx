@@ -5,7 +5,7 @@ import { bindActionCreators } from "redux";
 import { regenerateGame, fetchGameById, receiveCurrentGame } from "../actions";
 import PuzzleTable from "../components/PuzzleTable";
 import GameAdmin from "../components/GameAdmin";
-import { Grid, Cell } from "react-md";
+import { Button, Grid, Cell } from "react-md";
 
 class Game extends React.Component {
   public static propTypes = {
@@ -40,10 +40,21 @@ class Game extends React.Component {
     } else if (this.props.game.error === 404) {
       return <div className="alert alert-danger">404 Game not found</div>;
     } else {
+      let backHref =
+        "#/" +
+        (this.props.game && this.props.game.id
+          ? "game/" + this.props.game.id.id
+          : "");
+        // TODO: refresh the current game if we have id, go back otherwise
       return (
-        <div className="alert alert-danger">
-          Error loading game: {this.props.game.error}
-        </div>
+        <>
+          <div className="alert alert-danger">{this.props.game.error}</div>
+          <a href={backHref}>
+            <Button raised={true} primary={true}>
+              Back
+            </Button>
+          </a>
+        </>
       );
     }
   }
@@ -66,7 +77,8 @@ class Game extends React.Component {
 
 const mapStateToProps = (state: any) => ({
   config: state.config,
-  game: state.currentGame
+  game: state.currentGame,
+  error: state.gameError
 });
 
 const mapDispathToProps = (dispatch: any) =>

@@ -4,6 +4,14 @@ export const REFRESH_GAMES = "REFRESH_GAMES";
 export const REFRESH_CURRENT_GAME = "REFRESH_CURRENT_GAME";
 export const REFRESH_CONFIG = "REFRESH_CONFIG";
 export const REFRESH_NEW_GAME = "REFRESH_NEW_GAME ";
+export const REFRESH_GAME_ERROR = "REFRESH_GAME_ERROR";
+
+export const receiveGameError = (error: any) => {
+  return {
+    error,
+    type: REFRESH_GAME_ERROR
+  };
+};
 
 export const receiveGames = (games: any) => {
   return {
@@ -67,8 +75,14 @@ export const fetchGameById = (config: any, id: number) => {
         }
       })
       .catch(error => {
-        if (error && error.response && error.response.status === 404) {
-          dispatch(receiveCurrentGame({ error: 404 }));
+        if (error && error.response) {
+          if (error.response.status === 404) {
+            dispatch(receiveCurrentGame({ error: 404 }));
+          } else {
+            dispatch(receiveGameError(error.response.data));
+          }
+        } else {
+          dispatch(receiveGameError("Unknown error happened :("));
         }
         return Promise.reject(error);
       });
@@ -91,7 +105,7 @@ export const submitNewGame = (
         { withCredentials: true }
       )
       .then(response => {
-        dispatch(receiveNewGameStatus({ id: response.data }));
+        dispatch(receiveNewGameStatus({ id: response.data.id.id }));
       })
       .catch(error => {
         dispatch(
@@ -117,6 +131,29 @@ export const regenerateGame = (config: any, id: any) => {
       })
       .catch(error => {
         console.error("Failed to regenerate board", error);
+      });
+  };
+};
+
+export const publishGame = (config: any, game: any) => {
+  return (dispatch: any) => {
+    axios
+      .put(config.apiBaseUrl + "/game/" + game.id.id + "/publish", null, {
+        withCredentials: true
+      })
+      .then(response => {
+        if (response.status === 200) {
+          game.id.published = true;
+          dispatch(receiveCurrentGame(game));
+        }
+      })
+      .catch(error => {
+        console.error("Failed to publish game", error);
+        dispatch(
+          receiveGameError(
+            (error && error.response && error.response.data) || "Boo hoo :("
+          )
+        );
       });
   };
 };
