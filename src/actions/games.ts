@@ -135,26 +135,28 @@ export const regenerateGame = (config: any, id: any) => {
   };
 };
 
-export const publishGame = (config: any, game: any) => {
+export const publishGame = (config: any, game: any, updateForm: any) => {
   return (dispatch: any) => {
-    axios
-      .put(config.apiBaseUrl + "/game/" + game.id.id + "/publish", null, {
-        withCredentials: true
-      })
-      .then(response => {
-        if (response.status === 200) {
-          game.id.published = true;
-          dispatch(receiveCurrentGame(game));
-        }
-      })
-      .catch(error => {
-        console.error("Failed to publish game", error);
-        dispatch(
-          receiveGameError(
-            (error && error.response && error.response.data) || "Boo hoo :("
-          )
-        );
-      });
+    _updateGame(config, updateForm).then(() => {
+      axios
+        .put(config.apiBaseUrl + "/game/" + game.id.id + "/publish", null, {
+          withCredentials: true
+        })
+        .then(response => {
+          if (response.status === 200) {
+            game.id.published = true;
+            dispatch(receiveCurrentGame(game));
+          }
+        })
+        .catch(error => {
+          console.error("Failed to publish game", error);
+          dispatch(
+            receiveGameError(
+              (error && error.response && error.response.data) || "Boo hoo :("
+            )
+          );
+        });
+    });
   };
 };
 
@@ -162,4 +164,23 @@ export const clearNewGame = () => {
   return (dispatch: any) => {
     dispatch(receiveNewGameStatus(null));
   };
+};
+
+export const updateGame = (config: any, form: any) => {
+  console.log(form, new Date(form["availableFrom"]));
+  return (dispatch: any) => {
+    _updateGame(config, form)
+      .then(response => {
+        console.log("Boi");
+      })
+      .catch(error => {
+        console.error("Bruh");
+      });
+  };
+};
+
+const _updateGame = (config: any, form: any) => {
+  return axios.put(config.apiBaseUrl + "/game/" + form.id, form, {
+    withCredentials: true
+  });
 };

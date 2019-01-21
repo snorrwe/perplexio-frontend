@@ -7,14 +7,15 @@ import { applyMiddleware, createStore } from "redux";
 import { createLogger } from "redux-logger";
 import thunk from "redux-thunk";
 
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
 
-import { receiveConfig , receiveUserInfo} from "./actions";
+import { receiveConfig, receiveUserInfo } from "./actions";
 import App from "./containers/App";
-import "./index.css";
 import reducer from "./reducers";
 import registerServiceWorker from "./registerServiceWorker";
+
+import "./index.css";
 
 const middleware = [thunk];
 if (process.env.NODE_ENV !== "production") {
@@ -50,7 +51,7 @@ axios
         withCredentials: true
       })
       .then(response => {
-          store.dispatch(receiveUserInfo(response.data));
+        store.dispatch(receiveUserInfo(response.data));
       })
       .catch(error => {
         if (error.status !== 404) {

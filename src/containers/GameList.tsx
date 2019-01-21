@@ -23,7 +23,7 @@ class GameList extends React.Component {
       <>
         <div className="md-grid">
           <div className="md-cell">
-            <Button raised={true} secondary={true} onClick={this.listGames}>
+            <Button raised={true} primary={true} onClick={this.listGames}>
               Refresh Games
             </Button>
           </div>

@@ -1,4 +1,8 @@
 @import 'react-md/src/scss/react-md';
 
-$md-primary-color: $md-teal-500;
-$md-secondary-color: $md-purple-a-400;
+$md-light-theme: false; // optional for light theme
+$md-primary-color: $md-lime-800;
+$md-secondary-color: $md-deep-orange-a-700;
+
+$danger-color: $md-red-700;
+

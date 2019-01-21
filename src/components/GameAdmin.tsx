@@ -142,7 +142,7 @@ class GameAdmin extends React.Component {
 
   private publishGame() {
     const props = this.props;
-    props.publishGame(props.config, props.game);
+    props.publishGame(props.config, props.game, this.props.updateForm);
   }
 }
 

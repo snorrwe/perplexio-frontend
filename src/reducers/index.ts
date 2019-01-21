@@ -102,7 +102,7 @@ const validationReducer = (state = null, action: any) => {
 const solutionsReducer = (state = [], action: any) => {
   switch (action.type) {
     case REFRESH_CURRENT_GAME:
-      return action.game && action.game.table.solutions;
+      return action.game && action.game.table && action.game.table.solutions || state;
     case REFRESH_SOLUTIONS:
       return action.solutions;
     default:
@@ -115,7 +115,7 @@ const updateFormReducer = (state = null, action: any) => {
     case REFRESH_UPDATE_FORM:
       return action.formData;
     case REFRESH_CURRENT_GAME:
-      if (!action.game) {
+      if (!action.game || !action.game.id) {
         return null;
       }
       let id = action.game.id;

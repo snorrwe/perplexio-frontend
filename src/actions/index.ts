@@ -103,22 +103,6 @@ export const refreshValidation = (solution: any, ok: boolean) => {
   };
 };
 
-export const updateGame = (config: any, form: any) => {
-  console.log(form, new Date(form["availableFrom"]));
-  return (dispatch: any) => {
-    axios
-      .put(config.apiBaseUrl + "/game/" + form.id, form, {
-        withCredentials: true
-      })
-      .then(response => {
-        console.log("Boi");
-      })
-      .catch(error => {
-        console.error("Bruh");
-      });
-  };
-};
-
 export const refreshUpdateGameForm = (formData: any) => {
   return {
     formData,

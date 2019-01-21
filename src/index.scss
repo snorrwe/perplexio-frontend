@@ -1,4 +1,4 @@
-@import 'globals';
+@import "globals";
 
 @include react-md-everything;
 
@@ -6,4 +6,50 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
+}
+
+.App-header {
+  background-color: rgba($md-primary-color, 0.8);
+  padding: 20px;
+  color: white;
+}
+
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.new-game-word-list-item {
+  margin-left: 5px;
+}
+
+.new-game-word-list {
+  overflow: auto;
+  max-width: 100%;
+}
+
+.alert-danger {
+    background-color: $danger-color;
+    color: white;
 }

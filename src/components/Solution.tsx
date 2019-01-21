@@ -44,7 +44,7 @@ class Solution extends React.Component {
         opacity={0.3}
         offsetX={offset}
         offsetY={offset}
-        fill={this.props.color || "red"}
+        fill={this.props.color || "orange"}
         key={"" + startx + starty}
       />
     );

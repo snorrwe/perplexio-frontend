@@ -5,7 +5,8 @@ import { bindActionCreators } from "redux";
 import Game from "./Game";
 import GameList from "./GameList";
 import NewGame from "./NewGame";
-import "./App.scss";
+// import "./App.scss";
+import "../index.css";
 import { Button } from "react-md";
 
 class App extends React.Component {

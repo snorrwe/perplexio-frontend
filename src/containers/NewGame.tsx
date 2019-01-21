@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { clearNewGame, submitNewGame } from "../actions";
-import "./NewGame.css";
+import "../index.css";
 import { Button } from "react-md/lib/Buttons";
 import InputField from "react-md/lib/TextFields";
 import { Grid, Cell } from "react-md";
