@@ -51,7 +51,7 @@ class App extends React.Component {
     if (this.props.config) {
       return (
         <a href={this.props.config.apiBaseUrl + "/login"}>
-          <Button primary={true}>Log In</Button>
+          <Button raised={true} primary={true}>Log In</Button>
         </a>
       );
     }

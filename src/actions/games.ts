@@ -75,12 +75,19 @@ export const fetchGameById = (config: any, id: number) => {
   };
 };
 
-export const submitNewGame = (config: any, name: string, words: string[]) => {
+export const submitNewGame = (
+  config: any,
+  name: string,
+  words: string[],
+  availableRange: { startDate: any; endDate: any }
+) => {
+  let startDate = availableRange && availableRange.startDate;
+  let endDate = availableRange && availableRange.endDate;
   return (dispatch: any) => {
     axios
       .post(
         config.apiBaseUrl + "/game",
-        { name, words },
+        { name, words, availableFrom: startDate, availableTo: endDate },
         { withCredentials: true }
       )
       .then(response => {
