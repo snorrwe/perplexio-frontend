@@ -53,7 +53,7 @@ export const fetchGames = (config: any) => {
       .then(response => {
         if (response.status === 200) {
           const games = response.data;
-          dispatch(receiveGames(games));
+          dispatch(receiveGames(games.items));
         }
       });
   };
