@@ -46,7 +46,7 @@ class PuzzleTable extends React.Component {
       <Solution
         solution={[this.props.currentSelection[0], this.props.currentHover]}
         size={this.fontSize}
-        color="orange"
+        color="#1515FF"
       />
     );
   }
@@ -86,7 +86,7 @@ class PuzzleTable extends React.Component {
         <Solution
           solution={solution}
           size={this.fontSize}
-          color="lime"
+          color="#3bba14"
           key={"" + startx + starty}
         />
       );

@@ -41,7 +41,7 @@ class Solution extends React.Component {
         x={startx + offset}
         y={starty + offset}
         rotation={angle}
-        opacity={0.3}
+        opacity={0.5}
         offsetX={offset}
         offsetY={offset}
         fill={this.props.color || "orange"}
