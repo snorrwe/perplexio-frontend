@@ -19,10 +19,6 @@ class PuzzleTable extends React.Component {
 
   private fontSize: number;
 
-  constructor(props: any) {
-    super(props);
-  }
-
   public render() {
     const game = this.props.game;
     const rows = (this.props.game && this.props.game.table.table) || [];
