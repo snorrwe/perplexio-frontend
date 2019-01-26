@@ -11,7 +11,7 @@ class Solution extends React.Component {
   public static propTypes = {
     size: PropTypes.number,
     solution: PropTypes.any,
-      color: PropTypes.any
+    color: PropTypes.any
   };
   public props: any;
 
@@ -24,7 +24,7 @@ class Solution extends React.Component {
     let x = solution[1].x * this.props.size - startx;
     let y = solution[1].y * this.props.size - starty;
     let len = Math.sqrt(x * x + y * y);
-    if (len == 0) {
+    if (!len) {
       return null;
     }
     let angle = Math.acos(x / len);

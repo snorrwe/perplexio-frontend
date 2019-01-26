@@ -19,8 +19,16 @@ class PuzzleTable extends React.Component {
 
   private fontSize: number;
 
+  constructor(props: any) {
+    super(props);
+  }
+
   public render() {
     const game = this.props.game;
+    const rows = (this.props.game && this.props.game.table.table) || [];
+    const cols = this.props.game.table.columns;
+    const width = cols > rows.length ? cols : rows.length;
+    this.fontSize = WIDTH / width;
     return (
       <div>
         <h1>{game && game.id.name}</h1>
@@ -28,7 +36,7 @@ class PuzzleTable extends React.Component {
         <Stage width={WIDTH} height={HEIGHT}>
           <Layer>{this.solutions()}</Layer>
           <Layer>{this.selection()}</Layer>
-          <Layer>{this.table()}</Layer>
+          <Layer>{this.table(game)}</Layer>
         </Stage>
       </div>
     );
@@ -51,8 +59,8 @@ class PuzzleTable extends React.Component {
     );
   }
 
-  private table() {
-    if (!this.props.game) {
+  private table(game: any) {
+    if (!game) {
       return [];
     }
     const rows = (this.props.game && this.props.game.table.table) || [];

@@ -63,21 +63,19 @@ class Game extends React.Component {
       let backHref = "#/" + (game && game.id ? "game/" + game.id.id : "");
       // TODO: refresh the current game if we have id, go back otherwise
       return (
-        <>
-          <Card>
-            <div className="alert-danger">
-              <CardTitle title="Error" />
-              <CardText>
-                <div>{game.error}</div>
-                <a href={backHref}>
-                  <Button flat={true} onClick={this.handleBack}>
-                    Back
-                  </Button>
-                </a>
-              </CardText>
-            </div>
-          </Card>
-        </>
+        <Card>
+          <div className="alert-danger">
+            <CardTitle title="Error" />
+            <CardText>
+              <div>{game.error}</div>
+              <a href={backHref}>
+                <Button flat={true} onClick={this.handleBack}>
+                  Back
+                </Button>
+              </a>
+            </CardText>
+          </div>
+        </Card>
       );
     }
   }
