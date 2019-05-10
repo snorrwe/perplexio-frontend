@@ -82,6 +82,12 @@ class Game extends React.Component {
         {client => (
           <Query query={GAME_QUERY} variables={{ id: parseInt(gameId) }}>
             {({ loading, error, data, refetch }) => {
+              if (loading) {
+                return "loading...";
+              }
+              if (error) {
+                return this.renderError(error);
+              }
               const game = data.game;
               const puzzle = data.puzzle;
               const loading1 = loading;
@@ -95,10 +101,14 @@ class Game extends React.Component {
                   {({ data, refetch, loading, error }) => {
                     const solutions = data.getSolutionByGameId;
                     const refetchSolutions = refetch;
+                    const refetchAll = () => {
+                      refetchSolutions();
+                      refetchGame();
+                    };
                     return this.renderGame(
                       {
                         refetchSolutions,
-                        refetchGame,
+                        refetchGame: refetchAll,
                         game,
                         puzzle,
                         loading: loading1 || loading,
@@ -143,7 +153,7 @@ class Game extends React.Component {
             submitSolution={this.submitSolution}
           />
         </Cell>
-        <Cell size={6}>{this.renderAdmin(game)}</Cell>
+        <Cell size={6}>{this.renderAdmin(game, client, refetchGame)}</Cell>
       </Grid>
     );
   }
@@ -175,6 +185,7 @@ class Game extends React.Component {
   }
 
   private renderError(error: any) {
+    console.error("Rendering error", error)
     if (error.message) {
       return (
         <Card>
@@ -203,11 +214,15 @@ class Game extends React.Component {
     }
   }
 
-  public renderAdmin(game: any) {
+  public renderAdmin(
+    game: any,
+    client: any,
+    refetchAll: (...args: any[]) => {}
+  ) {
     if (!game.isOwner) {
       return null;
     }
-    return <GameAdmin game={game} />;
+    return <GameAdmin game={game} client={client} refetchGame={refetchAll} />;
   }
 }
 

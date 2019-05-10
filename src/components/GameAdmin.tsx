@@ -4,10 +4,47 @@ import { Button } from "react-md/lib/Buttons";
 import InputField from "react-md/lib/TextFields";
 import { Grid, Cell } from "react-md";
 import { DateRange } from "react-date-range";
+import gql from "graphql-tag";
+
+const PUBLISH_GAME = gql`
+  mutation($id: Int!) {
+    publishGame(gameId: $id)
+  }
+`;
+
+const REGENERATE_PUZZLE = gql`
+  mutation($id: Int!) {
+    regeneratePuzzle(gameId: $id) {
+      gameId
+    }
+  }
+`;
+
+const UPDATE_GAME = gql`
+  mutation(
+    $id: Int!
+    $name: String
+    $availableFrom: DateTimeUtc
+    $availableTo: DateTimeUtc
+  ) {
+    updateGame(
+      payload: {
+        gameId: $id
+        name: $name
+        availableFrom: $availableFrom
+        availableTo: $availableTo
+      }
+    ) {
+      id
+    }
+  }
+`;
 
 class GameAdmin extends React.Component {
   public static propTypes = {
-    game: PropTypes.any
+    game: PropTypes.any.isRequired,
+    client: PropTypes.any.isRequired,
+    refetchGame: PropTypes.func.isRequired
   };
 
   public props: any;
@@ -101,11 +138,19 @@ class GameAdmin extends React.Component {
   }
 
   private updateGame(event: any) {
-    let game = this.props && this.props.updateForm;
+    event.preventDefault();
+    let game = this.state.updateForm;
     if (!game) {
       return;
     }
-    this.props.updateGame(this.props.config, this.props.updateForm);
+    this.props.client
+      .mutate({
+        mutation: UPDATE_GAME,
+        variables: this.state.updateForm
+      })
+      .then(response => {
+        this.props.refetchGame();
+      });
   }
 
   private updateForm(key: any, value: any): any {
@@ -122,15 +167,26 @@ class GameAdmin extends React.Component {
     const range = value["availability"];
     let availableFrom = range["startDate"];
     let availableTo = range["endDate"];
-    let form = JSON.parse(JSON.stringify(this.props.updateForm));
+    let form = this.state.updateForm;
     form.availableFrom = availableFrom;
     form.availableTo = availableTo;
-    this.props.refreshUpdateGameForm(form);
+    this.setState({ updateForm: form });
   }
 
   private generateBoard(event: any) {
     event.preventDefault();
-    this.props.regenerateGame(this.props.config, this.props.updateForm.id);
+    this.props.client
+      .mutate({
+        mutation: REGENERATE_PUZZLE,
+        variables: {
+          id: this.props.game.id
+        }
+      })
+      .then(result => {
+        if (result.data) {
+          this.props.refetchGame();
+        }
+      });
   }
 
   private toggleSolutions(event: any) {
@@ -139,8 +195,16 @@ class GameAdmin extends React.Component {
   }
 
   private publishGame() {
-    const props = this.props;
-    props.publishGame(props.config, props.game, this.props.updateForm);
+    this.props.client
+      .mutate({
+        mutation: PUBLISH_GAME,
+        variables: {
+          id: this.props.game.id
+        }
+      })
+      .then(result => {
+        this.props.refetchGame();
+      });
   }
 
   public componentDidMount() {
