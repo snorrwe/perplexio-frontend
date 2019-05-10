@@ -1,5 +1,7 @@
 {
-  "extends": ["tslint-react"],
+  "extends": [
+    "tslint-react"
+  ],
   "linterOptions": {
     "exclude": [
       "config/**/*.js",
@@ -8,6 +10,7 @@
     ]
   },
   "rules": {
-      "no-console": false
+    "no-console": false,
+    "jsx-no-multiline-js": false
   }
 }

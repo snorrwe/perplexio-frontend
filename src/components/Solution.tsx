@@ -2,7 +2,7 @@ import * as PropTypes from "prop-types";
 import * as React from "react";
 import { Rect } from "react-konva";
 
-interface Vector {
+export interface Vector {
   x: number;
   y: number;
 }

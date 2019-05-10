@@ -1,77 +1,200 @@
-import * as PropTypes from "prop-types";
 import * as React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { regenerateGame, fetchGameById, receiveCurrentGame } from "../actions";
 import PuzzleTable from "../components/PuzzleTable";
 import GameAdmin from "../components/GameAdmin";
 import { Card, CardTitle, CardText, Button, Grid, Cell } from "react-md";
+import { Query, ApolloConsumer } from "react-apollo";
+import { ApolloClient } from "apollo-boost";
+import gql from "graphql-tag";
 
 import "../index.css";
 
-class Game extends React.Component {
-  public static propTypes = {
-    game: PropTypes.any
-  };
+const GAME_QUERY = gql`
+  query($id: Int!) {
+    game(id: $id) {
+      id
+      name
+      owner
+      availableFrom
+      availableTo
+      published
+      isOwner
+    }
+    puzzle(gameId: $id) {
+      gameTable
+      columns
+      rows
+    }
+  }
+`;
 
-  public props: any;
+const SOLUTION_QUERY = gql`
+  query($id: Int!) {
+    getSolutionByGameId(gameId: $id) {
+      solution1 {
+        x
+        y
+      }
+      solution2 {
+        x
+        y
+      }
+    }
+  }
+`;
+
+const SOLUTION_SUBMIT = gql`
+  mutation($id: Int!, $solution: [Int!]!) {
+    submitSolution(gameId: $id, solution: $solution)
+  }
+`;
+
+class Game extends React.Component {
+  public props: { match: any };
+
   public state = {
     availableFrom: undefined,
     availableTo: undefined,
     name: undefined,
     renderSolutions: true,
-    game: undefined
+    game: undefined,
+    refetchSolutions: () => {},
+    refetchGame: () => {},
+    apolloClient: {} as ApolloClient<any>
   };
 
-  constructor(props: any) {
+  constructor(props) {
     super(props);
-    this.handleBack = this.handleBack.bind(this);
+    this.submitSolution = this.submitSolution.bind(this);
   }
 
   public render() {
-    if (!this.props.game) {
-      return <h4>Loading...</h4>;
-    }
-    if (!this.props.game.error) {
+    let gameId = this.props.match.params.id;
+    if (!gameId) {
       return (
-        <Grid>
-          <Cell size={6}>
-            <PuzzleTable
-              renderSolutions={this.state.renderSolutions}
-              game={this.props.game}
-            />
-          </Cell>
-          <Cell size={6}>{this.renderAdmin(this.props.game)}</Cell>
-        </Grid>
+        <a href="#/">
+          <Button flat={true}>Take me back to the home page</Button>
+        </a>
       );
-    } else {
-      return this.renderError(this.props.game);
     }
+
+    return (
+      <ApolloConsumer>
+        {client => (
+          <Query query={GAME_QUERY} variables={{ id: parseInt(gameId) }}>
+            {({ loading, error, data, refetch }) => {
+              const game = data.game;
+              const puzzle = data.puzzle;
+              const loading1 = loading;
+              const error1 = error;
+              const refetchGame = refetch;
+              return (
+                <Query
+                  query={SOLUTION_QUERY}
+                  variables={{ id: parseInt(gameId) }}
+                >
+                  {({ data, refetch, loading, error }) => {
+                    const solutions = data.getSolutionByGameId;
+                    const refetchSolutions = refetch;
+                    return this.renderGame(
+                      {
+                        refetchSolutions,
+                        refetchGame,
+                        game,
+                        puzzle,
+                        loading: loading1 || loading,
+                        error: error1 || error,
+                        solutions
+                      },
+                      client
+                    );
+                  }}
+                </Query>
+              );
+            }}
+          </Query>
+        )}
+      </ApolloConsumer>
+    );
   }
 
-  private renderError(game: any) {
-    if (game.error === 404) {
+  private renderGame(
+    { loading, game, puzzle, solutions, error, refetchSolutions, refetchGame },
+    client: ApolloClient<any>
+  ) {
+    this.state.refetchSolutions = refetchSolutions; // Do not trigger rerender
+    this.state.refetchGame = refetchGame; // Do not trigger rerender
+    this.state.apolloClient = client; // Do not trigger rerender
+    this.state.game = game; // Do not trigger rerender
+    if (loading) {
+      return <h4>Loading...</h4>;
+    }
+    if (error) {
+      return this.renderError(error);
+    }
+
+    return (
+      <Grid>
+        <Cell size={6}>
+          <PuzzleTable
+            renderSolutions={this.state.renderSolutions}
+            game={game}
+            puzzle={puzzle}
+            solutions={solutions}
+            submitSolution={this.submitSolution}
+          />
+        </Cell>
+        <Cell size={6}>{this.renderAdmin(game)}</Cell>
+      </Grid>
+    );
+  }
+
+  private submitSolution(solution1, solution2) {
+    const game = this.state.game as any;
+    console.log("Submit ", solution1, solution2, game);
+    if (!solution1 || !solution2 || game == null) {
+      return;
+    }
+    [solution1, solution2] = [solution1, solution2].sort(
+      (a, b) => a.x - b.x || a.y - b.y
+    );
+    this.state.apolloClient
+      .mutate({
+        mutation: SOLUTION_SUBMIT,
+        variables: {
+          id: game.id,
+          solution: [solution1.x, solution1.y, solution2.x, solution2.y]
+        }
+      })
+      .then(response => {
+        console.log(response.data.submitSolution);
+        const found = response.data.submitSolution;
+        if (found) {
+          this.state.refetchSolutions();
+        }
+      });
+  }
+
+  private renderError(error: any) {
+    if (error.message) {
       return (
         <Card>
           <div className="alert-danger">
             <CardTitle title="Error" />
-            <CardText>404 Game not found</CardText>
+            <CardText>{error.message}</CardText>
           </div>
         </Card>
       );
     } else {
-      let backHref = "#/" + (game && game.id ? "game/" + game.id.id : "");
+      let backHref = "#/";
       // TODO: refresh the current game if we have id, go back otherwise
       return (
         <Card>
           <div className="alert-danger">
             <CardTitle title="Error" />
             <CardText>
-              <div>{game.error}</div>
+              <div>{error}</div>
               <a href={backHref}>
-                <Button flat={true} onClick={this.handleBack}>
-                  Back
-                </Button>
+                <Button flat={true}>Take me back to the home page</Button>
               </a>
             </CardText>
           </div>
@@ -80,40 +203,12 @@ class Game extends React.Component {
     }
   }
 
-  private renderAdmin(game: any) {
-    if (!game.is_owner && !game.isOwner) {
+  public renderAdmin(game: any) {
+    if (!game.isOwner) {
       return null;
     }
     return <GameAdmin game={game} />;
   }
-
-  public componentDidMount() {
-    this.props.fetchGameById(this.props.config, this.props.match.params.id);
-  }
-
-  public componentWillUnmount() {
-    this.props.receiveCurrentGame(null);
-  }
-
-  private handleBack() {
-    this.props.receiveCurrentGame(null);
-    this.props.fetchGameById(this.props.config, this.props.match.params.id);
-  }
 }
 
-const mapStateToProps = (state: any) => ({
-  config: state.config,
-  game: state.currentGame,
-  error: state.gameError
-});
-
-const mapDispathToProps = (dispatch: any) =>
-  bindActionCreators(
-    { regenerateGame, fetchGameById, receiveCurrentGame },
-    dispatch
-  );
-
-export default connect(
-  mapStateToProps,
-  mapDispathToProps
-)(Game);
+export default Game;

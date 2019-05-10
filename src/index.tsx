@@ -1,28 +1,17 @@
 import axios from "axios";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { Provider } from "react-redux";
-
-import { applyMiddleware, createStore } from "redux";
-import { createLogger } from "redux-logger";
-import thunk from "redux-thunk";
 
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css"; // theme css file
 
-import { receiveConfig, receiveUserInfo } from "./actions";
 import App from "./containers/App";
-import reducer from "./reducers";
 import registerServiceWorker from "./registerServiceWorker";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "react-apollo";
 
 import "./index.css";
 
-const middleware = [thunk];
-if (process.env.NODE_ENV !== "production") {
-  middleware.push(createLogger() as any);
-}
-
-const store = createStore(reducer, applyMiddleware(...middleware));
 let local = window.location;
 let baseUrl =
   local.protocol + "//" + local.host + "/" + local.pathname.split("/")[1];
@@ -30,34 +19,26 @@ let baseUrl =
 axios
   .get(baseUrl + "/config.json")
   .then(response => {
-    let config = null;
+    let config: any = null;
     if (response.status === 200) {
       config = response.data;
+      if (config == null) {
+        config = {};
+      }
       config.baseUrl = baseUrl;
-      store.dispatch(receiveConfig(config));
     }
+    const client = new ApolloClient({
+      uri: config.apiBaseUrl + "/graphql",
+      credentials: "include"
+    });
     ReactDOM.render(
-      <Provider store={store}>
-        <App />
-      </Provider>,
+      <ApolloProvider client={client}>
+        <App config={config} />
+      </ApolloProvider>,
       document.getElementById("root") as HTMLElement
     );
     registerServiceWorker();
     return config;
-  })
-  .then(config => {
-    return axios
-      .get(config.apiBaseUrl + "/userinfo", {
-        withCredentials: true
-      })
-      .then(response => {
-        store.dispatch(receiveUserInfo(response.data));
-      })
-      .catch(error => {
-        if (error.status !== 404) {
-          console.error("Error while retrieving userinfo", error);
-        }
-      });
   })
   .catch(error => {
     console.error("Failed to load config!", error);

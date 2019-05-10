@@ -1,11 +1,8 @@
 import * as React from "react";
-import { connect } from "react-redux";
 import { HashRouter as Router, Link, Route } from "react-router-dom";
-import { bindActionCreators } from "redux";
 import Game from "./Game";
 import GameList from "./GameList";
 import NewGame from "./NewGame";
-// import "./App.scss";
 import "../index.css";
 import { Button } from "react-md";
 
@@ -52,7 +49,9 @@ class App extends React.Component {
     if (this.props.config) {
       return (
         <a href={this.props.config.apiBaseUrl + "/login"}>
-          <Button raised={true} primary={true}>Log In</Button>
+          <Button raised={true} primary={true}>
+            Log In
+          </Button>
         </a>
       );
     }
@@ -60,13 +59,4 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = (state: any) => ({
-  config: state.config,
-  userinfo: state.userinfo
-});
-const mapDispathToProps = (dispatch: any) => bindActionCreators({}, dispatch);
-
-export default connect(
-  mapStateToProps,
-  mapDispathToProps
-)(App);
+export default App;

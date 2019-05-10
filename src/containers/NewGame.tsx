@@ -1,23 +1,38 @@
-import * as PropTypes from "prop-types";
 import * as React from "react";
-import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { bindActionCreators } from "redux";
-import { clearNewGame, submitNewGame } from "../actions";
 import "../index.css";
 import { Button } from "react-md/lib/Buttons";
 import InputField from "react-md/lib/TextFields";
 import { Grid, Cell } from "react-md";
 import { DateRange } from "react-date-range";
+import { Mutation } from "react-apollo";
+import gql from "graphql-tag";
+
+const NEW_GAME_MUTATION = gql`
+  mutation(
+    $name: String!
+    $words: [String!]!
+    $availableFrom: DateTimeUtc!
+    $availableTo: DateTimeUtc!
+  ) {
+    addGame(
+      submission: {
+        name: $name
+        words: $words
+        availableFrom: $availableFrom
+        availableTo: $availableTo
+      }
+    ) {
+      id
+    }
+  }
+`;
 
 const puzzleWordsLabel =
   "Words to place in the puzzle (separated by spaces). Words must " +
   "contain only lowercase letters of the english alphabet";
 
 class NewGame extends React.Component {
-  public static propTypes = {
-    newGameStatus: PropTypes.object
-  };
 
   public props: any;
   public state = {
@@ -28,7 +43,8 @@ class NewGame extends React.Component {
       startDate: new Date(),
       endDate: new Date(),
       key: "availability"
-    }
+    },
+    newGameId: null,
   };
 
   constructor(props: any) {
@@ -41,15 +57,10 @@ class NewGame extends React.Component {
     this.handleAvialabilityChange = this.handleAvialabilityChange.bind(this);
   }
 
-  public render() {
-    if (this.props.newGameStatus) {
-      if (this.props.newGameStatus.id) {
-        this.props.clearNewGame();
-        return <Redirect to={"/game/" + this.props.newGameStatus.id} />;
-      }
-    }
+  private renderNewGame(addNewGame: (config: any) => any): React.ReactNode {
+    let handleSubmit = (e) => this.handleSubmit(e, addNewGame);
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <Grid>
           <Cell size={6}>
             <InputField
@@ -98,16 +109,31 @@ class NewGame extends React.Component {
     );
   }
 
-  public handleSubmit(event: any) {
+  public render() {
+    if (this.state.newGameId) {
+        return <Redirect to={"/game/" + this.state.newGameId} />;
+    }
+    return (
+      <Mutation mutation={NEW_GAME_MUTATION}>
+        {addNewGame => this.renderNewGame(addNewGame)}
+      </Mutation>
+    );
+  }
+
+  public handleSubmit(event: any, addNewGame: any) {
     console.log(event, this, this.hasError());
     event.preventDefault();
     if (!this.hasError()) {
-      this.props.submitNewGame(
-        this.props.config,
-        this.state.name,
-        this.state.words,
-        this.state.availableRange
-      );
+      addNewGame({
+        variables: {
+          name: this.state.name,
+          words: this.state.words,
+          availableFrom: this.state.availableRange.startDate,
+          availableTo: this.state.availableRange.endDate
+        }
+      }).then(response => {
+        this.setState({newGameId: response.data.addGame.id})
+      });
     }
   }
 
@@ -197,15 +223,4 @@ class NewGame extends React.Component {
   }
 }
 
-const mapStateToProps = (state: any) => ({
-  config: state.config,
-  game: state.currentGame,
-  newGameStatus: state.newGameStatus
-});
-const mapDispathToProps = (dispatch: any) =>
-  bindActionCreators({ submitNewGame, clearNewGame }, dispatch);
-
-export default connect(
-  mapStateToProps,
-  mapDispathToProps
-)(NewGame);
+export default NewGame;

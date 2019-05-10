@@ -1,21 +1,16 @@
 import * as PropTypes from "prop-types";
 import * as React from "react";
 import { Text } from "react-konva";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import {
-  validateSolution,
-  receiveHoveredNode,
-  startSelection,
-  endSelection
-} from "../actions";
 
 class PuzzleNode extends React.Component {
   public static propTypes = {
     fontSize: PropTypes.number.isRequired,
     value: PropTypes.string.isRequired,
     x: PropTypes.number.isRequired,
-    y: PropTypes.number.isRequired
+    y: PropTypes.number.isRequired,
+    receiveHoveredNode: PropTypes.func.isRequired,
+    startSelection: PropTypes.func.isRequired,
+    endSelection: PropTypes.func.isRequired,
   };
 
   public props: any;
@@ -50,27 +45,8 @@ class PuzzleNode extends React.Component {
     });
     this.node.on("mouseup", (event: any) => {
       this.props.endSelection(this.props);
-      this.props.validateSolution(
-        this.props.config,
-        [this.props.currentSelection[0], this.props],
-        this.props.game.id.id
-      );
     });
   }
 }
 
-const mapStateToProps = (state: any) => ({
-  game: state.currentGame,
-  currentSelection: state.currentSelection,
-  config: state.config
-});
-const mapDispathToProps = (dispatch: any) =>
-  bindActionCreators(
-    { startSelection, endSelection, receiveHoveredNode, validateSolution },
-    dispatch
-  );
-
-export default connect(
-  mapStateToProps,
-  mapDispathToProps
-)(PuzzleNode);
+export default PuzzleNode;

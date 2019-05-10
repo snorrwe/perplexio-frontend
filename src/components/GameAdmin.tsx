@@ -1,13 +1,5 @@
 import * as PropTypes from "prop-types";
 import * as React from "react";
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import {
-  publishGame,
-  regenerateGame,
-  refreshUpdateGameForm,
-  updateGame
-} from "../actions";
 import { Button } from "react-md/lib/Buttons";
 import InputField from "react-md/lib/TextFields";
 import { Grid, Cell } from "react-md";
@@ -15,11 +7,14 @@ import { DateRange } from "react-date-range";
 
 class GameAdmin extends React.Component {
   public static propTypes = {
-    updateForm: PropTypes.any,
     game: PropTypes.any
   };
 
   public props: any;
+
+  public state: any = {
+    updateForm: null
+  };
 
   constructor(props: any) {
     super(props);
@@ -32,18 +27,21 @@ class GameAdmin extends React.Component {
   }
 
   public render() {
-    let updateForm = this.props.updateForm;
+    let game = this.state.updateForm;
+    if (!game) {
+      return "Loading...";
+    }
     let availableRange = {
-      startDate: new Date(updateForm.availableFrom),
-      endDate: new Date(updateForm.availableTo),
+      startDate: new Date(game.availableFrom),
+      endDate: new Date(game.availableTo),
       key: "availability"
     };
-    if (this.props.game.id.published) {
+    if (game.published) {
       return (
         <>
           <Grid>
             <Cell size={4}>
-              <div>Game is live until {this.props.game.id.availableTo}</div>
+              <div>Game is live until {game.availableTo}</div>
             </Cell>
           </Grid>
         </>
@@ -72,7 +70,7 @@ class GameAdmin extends React.Component {
               label="Name of the game"
               type="text"
               required={true}
-              value={updateForm.name}
+              value={game.name}
               onChange={this.handleNameChange}
             />
           </Cell>
@@ -111,9 +109,9 @@ class GameAdmin extends React.Component {
   }
 
   private updateForm(key: any, value: any): any {
-    let form = JSON.parse(JSON.stringify(this.props.updateForm));
-    form[key] = value;
-    this.props.refreshUpdateGameForm(form);
+    let updateForm = this.state.updateForm;
+    updateForm[key] = value;
+    this.setState({ updateForm });
   }
 
   private handleNameChange(value: any) {
@@ -144,20 +142,10 @@ class GameAdmin extends React.Component {
     const props = this.props;
     props.publishGame(props.config, props.game, this.props.updateForm);
   }
+
+  public componentDidMount() {
+    this.setState({ updateForm: JSON.parse(JSON.stringify(this.props.game)) });
+  }
 }
 
-const mapStateToProps = (state: any) => ({
-  config: state.config,
-  updateForm: state.updateForm
-});
-
-const mapDispathToProps = (dispatch: any) =>
-  bindActionCreators(
-    { publishGame, regenerateGame, refreshUpdateGameForm, updateGame },
-    dispatch
-  );
-
-export default connect(
-  mapStateToProps,
-  mapDispathToProps
-)(GameAdmin);
+export default GameAdmin;
