@@ -33,18 +33,17 @@ const puzzleWordsLabel =
   "contain only lowercase letters of the english alphabet";
 
 class NewGame extends React.Component {
-
   public props: any;
   public state = {
     name: "",
     words: [],
-    invalidWords: null,
+    errors: [],
     availableRange: {
       startDate: new Date(),
       endDate: new Date(),
       key: "availability"
     },
-    newGameId: null,
+    newGameId: null
   };
 
   constructor(props: any) {
@@ -58,7 +57,7 @@ class NewGame extends React.Component {
   }
 
   private renderNewGame(addNewGame: (config: any) => any): React.ReactNode {
-    let handleSubmit = (e) => this.handleSubmit(e, addNewGame);
+    let handleSubmit = e => this.handleSubmit(e, addNewGame);
     return (
       <form onSubmit={handleSubmit}>
         <Grid>
@@ -95,7 +94,7 @@ class NewGame extends React.Component {
             />
           </Cell>
         </Grid>
-        {this.renderWords(this.state.words, this.state.invalidWords)}
+        {this.renderWords(this.state.words)}
         {this.renderError()}
         <Button
           type="submit"
@@ -111,7 +110,7 @@ class NewGame extends React.Component {
 
   public render() {
     if (this.state.newGameId) {
-        return <Redirect to={"/game/" + this.state.newGameId} />;
+      return <Redirect to={"/game/" + this.state.newGameId} />;
     }
     return (
       <Mutation mutation={NEW_GAME_MUTATION}>
@@ -131,9 +130,13 @@ class NewGame extends React.Component {
           availableFrom: this.state.availableRange.startDate,
           availableTo: this.state.availableRange.endDate
         }
-      }).then(response => {
-        this.setState({newGameId: response.data.addGame.id})
-      });
+      })
+        .then(response => {
+          this.setState({ newGameId: response.data.addGame.id, errors: [] });
+        })
+        .catch(error => {
+          this.setState({ errors: [error.message] });
+        });
     }
   }
 
@@ -145,7 +148,7 @@ class NewGame extends React.Component {
     const words: string[] = value
       .split(/ |,/)
       .filter((word: string) => word.length !== 0);
-    const wordRegex = /^[a-z]+$/;
+    const wordRegex = /^[a-z]2+$/;
     let invalidWords = words.filter(word => !wordRegex.test(word));
     if (invalidWords.length === 0) {
       invalidWords = null as any;
@@ -153,10 +156,8 @@ class NewGame extends React.Component {
     this.setState({ words, errors: { invalidWords } });
   }
 
-  private renderWords(words: string[], errors: null | string[]) {
-    if (errors) {
-      return this.renderWordsErrors(errors);
-    } else if (!words.length) {
+  private renderWords(words: string[]) {
+    if (!words.length) {
       return <div />;
     }
     const renderWords = () => {
@@ -175,34 +176,22 @@ class NewGame extends React.Component {
     );
   }
 
-  private renderWordsErrors(errors: string[]) {
-    const renderErrors = () => {
-      return errors.map((word: string, index: number) => (
-        <span className="new-game-word-list-item" key={index}>
-          {word}
-        </span>
-      ));
-    };
-    return (
-      <div className="alert alert-danger">
-        <b>It seems like you have invalid words in your list. Invalid words:</b>
-        <br />
-        <div className="new-game-word-list">{renderErrors()}</div>
-      </div>
-    );
-  }
-
   private hasError(): boolean | undefined {
-    return this.state.invalidWords as any;
+    return this.state.errors != null && this.state.errors.length > 0;
   }
 
   private renderError() {
-    if (this.props.newGameStatus && this.props.newGameStatus.error) {
+    const errors = this.state.errors;
+    if (errors.length) {
       return (
         <div className="alert alert-danger">
           <b>Error:</b>
           <br />
-          {this.props.newGameStatus.error}
+          <ul>
+            {errors.map(e => (
+              <li>{e}</li>
+            ))}
+          </ul>
         </div>
       );
     }
